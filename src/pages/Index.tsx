@@ -1,12 +1,394 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import Icon from "@/components/ui/icon";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Index = () => {
+  const stats = [
+    { label: "Активных авто", value: "47", change: "+3", icon: "Car", color: "text-green-400" },
+    { label: "Водителей на линии", value: "38", change: "+5", icon: "Users", color: "text-blue-400" },
+    { label: "Расходы за месяц", value: "₽2.4M", change: "-8%", icon: "TrendingDown", color: "text-orange-400" },
+    { label: "Пробег сегодня", value: "4,832 км", change: "+12%", icon: "Gauge", color: "text-purple-400" },
+  ];
+
+  const vehicles = [
+    { id: "A-101", brand: "Mercedes Sprinter", status: "active", fuel: 85, location: "Москва, ул. Тверская", driver: "Иванов И.И.", mileage: "234 км" },
+    { id: "A-102", brand: "Ford Transit", status: "active", fuel: 62, location: "Санкт-Петербург, Невский пр.", driver: "Петров П.П.", mileage: "189 км" },
+    { id: "A-103", brand: "Volkswagen Crafter", status: "maintenance", fuel: 15, location: "СТО №4", driver: "—", mileage: "12 км" },
+    { id: "A-104", brand: "Iveco Daily", status: "inactive", fuel: 0, location: "Парковка центральная", driver: "—", mileage: "0 км" },
+    { id: "A-105", brand: "GAZ Next", status: "active", fuel: 91, location: "Казань, пр. Победы", driver: "Сидоров С.С.", mileage: "312 км" },
+  ];
+
+  const drivers = [
+    { name: "Иванов Иван Иванович", rating: 4.9, trips: 234, efficiency: 96, status: "active" },
+    { name: "Петров Петр Петрович", rating: 4.7, trips: 198, efficiency: 92, status: "active" },
+    { name: "Сидоров Сергей Сергеевич", rating: 4.8, trips: 267, efficiency: 94, status: "active" },
+    { name: "Кузнецов Алексей Павлович", rating: 4.6, trips: 156, efficiency: 89, status: "inactive" },
+  ];
+
+  const maintenanceSchedule = [
+    { vehicle: "A-101", type: "ТО-2", date: "15 февраля", status: "scheduled" },
+    { vehicle: "A-103", type: "Ремонт подвески", date: "Сегодня", status: "inProgress" },
+    { vehicle: "A-107", type: "ТО-1", date: "18 февраля", status: "scheduled" },
+    { vehicle: "A-102", type: "Замена масла", date: "22 февраля", status: "scheduled" },
+  ];
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      active: { label: "Активен", className: "status-active" },
+      inactive: { label: "Не активен", className: "status-inactive" },
+      maintenance: { label: "На ТО", className: "status-maintenance" },
+    };
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.inactive;
+    return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4 color-black text-black">Добро пожаловать!</h1>
-        <p className="text-xl text-gray-600">тут будет отображаться ваш проект</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+              <Icon name="Truck" className="text-primary-foreground" size={24} />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">AutoFleet Pro</h1>
+              <p className="text-xs text-muted-foreground">Управление автопарком</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon">
+              <Icon name="Bell" size={20} />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Icon name="Settings" size={20} />
+            </Button>
+            <Avatar>
+              <AvatarFallback className="bg-primary text-primary-foreground">АД</AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
+      </header>
+
+      <aside className="fixed left-0 top-[73px] h-[calc(100vh-73px)] w-64 border-r border-border bg-card/50 backdrop-blur-sm p-4 hidden lg:block">
+        <nav className="space-y-2">
+          <Button variant="default" className="w-full justify-start gap-3">
+            <Icon name="LayoutDashboard" size={18} />
+            Дашборд
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3">
+            <Icon name="Car" size={18} />
+            Автопарк
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3">
+            <Icon name="Users" size={18} />
+            Водители
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3">
+            <Icon name="Map" size={18} />
+            GPS мониторинг
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3">
+            <Icon name="Wrench" size={18} />
+            ТО и ремонт
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3">
+            <Icon name="FileText" size={18} />
+            Отчёты
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3">
+            <Icon name="CreditCard" size={18} />
+            Биллинг
+          </Button>
+        </nav>
+      </aside>
+
+      <main className="lg:ml-64 p-6 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((stat, idx) => (
+            <Card key={idx} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <Icon name={stat.icon as any} className={stat.color} size={32} />
+                  <Badge variant="secondary" className="text-xs">{stat.change}</Badge>
+                </div>
+                <div className="text-3xl font-bold mb-1">{stat.value}</div>
+                <div className="text-sm text-muted-foreground">{stat.label}</div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="TrendingUp" size={20} />
+                Расходы по категориям
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  { label: "Топливо", value: 65, amount: "₽1.56M" },
+                  { label: "ТО и ремонт", value: 20, amount: "₽480K" },
+                  { label: "Страхование", value: 10, amount: "₽240K" },
+                  { label: "Прочее", value: 5, amount: "₽120K" },
+                ].map((item, idx) => (
+                  <div key={idx}>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">{item.label}</span>
+                      <span className="font-semibold">{item.amount}</span>
+                    </div>
+                    <Progress value={item.value} className="h-2" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="AlertCircle" size={20} />
+                Уведомления
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <Icon name="AlertTriangle" className="text-red-400 flex-shrink-0" size={20} />
+                  <div>
+                    <p className="text-sm font-medium">Критический уровень топлива</p>
+                    <p className="text-xs text-muted-foreground">A-103 • 15%</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <Icon name="Clock" className="text-yellow-400 flex-shrink-0" size={20} />
+                  <div>
+                    <p className="text-sm font-medium">Плановое ТО сегодня</p>
+                    <p className="text-xs text-muted-foreground">A-101 • 14:00</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <Icon name="Info" className="text-blue-400 flex-shrink-0" size={20} />
+                  <div>
+                    <p className="text-sm font-medium">Истекает страховка</p>
+                    <p className="text-xs text-muted-foreground">A-107 • через 5 дней</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="vehicles" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="vehicles">Автопарк</TabsTrigger>
+            <TabsTrigger value="drivers">Водители</TabsTrigger>
+            <TabsTrigger value="maintenance">График ТО</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="vehicles" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Список автомобилей</CardTitle>
+                  <Button>
+                    <Icon name="Plus" size={16} className="mr-2" />
+                    Добавить авто
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {vehicles.map((vehicle) => (
+                    <div key={vehicle.id} className="p-4 border border-border rounded-lg hover:bg-card/50 transition-colors">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                            <Icon name="Truck" className="text-primary" size={24} />
+                          </div>
+                          <div>
+                            <div className="font-semibold flex items-center gap-2">
+                              {vehicle.id} • {vehicle.brand}
+                            </div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              <Icon name="MapPin" size={14} />
+                              {vehicle.location}
+                            </div>
+                          </div>
+                        </div>
+                        {getStatusBadge(vehicle.status)}
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <div className="text-muted-foreground mb-1">Водитель</div>
+                          <div className="font-medium">{vehicle.driver}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">Топливо</div>
+                          <div className="flex items-center gap-2">
+                            <Progress value={vehicle.fuel} className="h-1.5 flex-1" />
+                            <span className="font-medium">{vehicle.fuel}%</span>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">Пробег сегодня</div>
+                          <div className="font-medium">{vehicle.mileage}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="drivers" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Водители</CardTitle>
+                  <Button>
+                    <Icon name="UserPlus" size={16} className="mr-2" />
+                    Добавить водителя
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {drivers.map((driver, idx) => (
+                    <div key={idx} className="p-4 border border-border rounded-lg hover:bg-card/50 transition-colors">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-12 h-12">
+                            <AvatarFallback className="bg-primary/10 text-primary">
+                              {driver.name.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-semibold">{driver.name}</div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              <Icon name="Star" size={14} className="text-yellow-400 fill-yellow-400" />
+                              {driver.rating} • {driver.trips} поездок
+                            </div>
+                          </div>
+                        </div>
+                        {getStatusBadge(driver.status)}
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <div className="text-muted-foreground mb-1">Эффективность</div>
+                          <div className="flex items-center gap-2">
+                            <Progress value={driver.efficiency} className="h-1.5 flex-1" />
+                            <span className="font-medium">{driver.efficiency}%</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="outline" size="sm">
+                            <Icon name="FileText" size={14} className="mr-1" />
+                            Отчёт
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Icon name="MessageCircle" size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="maintenance" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>График технического обслуживания</CardTitle>
+                  <Button>
+                    <Icon name="Calendar" size={16} className="mr-2" />
+                    Запланировать ТО
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {maintenanceSchedule.map((item, idx) => (
+                    <div key={idx} className="p-4 border border-border rounded-lg hover:bg-card/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                            <Icon name="Wrench" className="text-primary" size={24} />
+                          </div>
+                          <div>
+                            <div className="font-semibold">{item.vehicle} • {item.type}</div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              <Icon name="Calendar" size={14} />
+                              {item.date}
+                            </div>
+                          </div>
+                        </div>
+                        {item.status === "inProgress" ? (
+                          <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">В работе</Badge>
+                        ) : (
+                          <Badge variant="outline">Запланировано</Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="Map" size={20} />
+                GPS мониторинг
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-video bg-muted/30 rounded-lg flex items-center justify-center border border-border">
+                <div className="text-center">
+                  <Icon name="MapPin" size={48} className="mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground mb-3">Интеграция с картами в разработке</p>
+                  <Button variant="outline" size="sm">
+                    Настроить GPS
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="CreditCard" size={20} />
+                Биллинг и платежи
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-video bg-muted/30 rounded-lg flex items-center justify-center border border-border">
+                <div className="text-center">
+                  <Icon name="Wallet" size={48} className="mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground mb-3">Модуль биллинга готовится к запуску</p>
+                  <Button variant="outline" size="sm">
+                    Настроить платежи
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
   );
 };
