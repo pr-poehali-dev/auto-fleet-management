@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -5,8 +6,12 @@ import { Progress } from "@/components/ui/progress";
 import Icon from "@/components/ui/icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 
 const Index = () => {
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
   const stats = [
     { label: "Активных авто", value: "47", change: "+3", icon: "Car", color: "text-green-400" },
     { label: "Водителей на линии", value: "38", change: "+5", icon: "Users", color: "text-blue-400" },
@@ -45,6 +50,16 @@ const Index = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.inactive;
     return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
   };
+
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    const matchesStatus = filterStatus === "all" || vehicle.status === filterStatus;
+    const matchesSearch = 
+      vehicle.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicle.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicle.driver.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicle.location.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -195,17 +210,67 @@ const Index = () => {
           <TabsContent value="vehicles" className="space-y-4">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-4">
                   <CardTitle>Список автомобилей</CardTitle>
                   <Button>
                     <Icon name="Plus" size={16} className="mr-2" />
                     Добавить авто
                   </Button>
                 </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="relative flex-1">
+                    <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                    <Input
+                      placeholder="Поиск по ID, марке, водителю или локации..."
+                      className="pl-10"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={filterStatus === "all" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("all")}
+                    >
+                      Все ({vehicles.length})
+                    </Button>
+                    <Button
+                      variant={filterStatus === "active" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("active")}
+                      className={filterStatus === "active" ? "" : "status-active border"}
+                    >
+                      Активные
+                    </Button>
+                    <Button
+                      variant={filterStatus === "maintenance" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("maintenance")}
+                      className={filterStatus === "maintenance" ? "" : "status-maintenance border"}
+                    >
+                      На ТО
+                    </Button>
+                    <Button
+                      variant={filterStatus === "inactive" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("inactive")}
+                      className={filterStatus === "inactive" ? "" : "status-inactive border"}
+                    >
+                      Не активны
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {vehicles.map((vehicle) => (
+                {filteredVehicles.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Icon name="SearchX" className="mx-auto mb-3 text-muted-foreground" size={48} />
+                    <p className="text-muted-foreground">Автомобили не найдены</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {filteredVehicles.map((vehicle) => (
                     <div key={vehicle.id} className="p-4 border border-border rounded-lg hover:bg-card/50 transition-colors">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
@@ -242,8 +307,9 @@ const Index = () => {
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
