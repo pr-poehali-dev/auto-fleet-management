@@ -7,12 +7,16 @@ import Icon from "@/components/ui/icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Sheet,
@@ -32,6 +36,21 @@ const Index = () => {
   const [showAddDriver, setShowAddDriver] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const [newVehicle, setNewVehicle] = useState({
+    id: "",
+    brand: "",
+    status: "active",
+    location: "",
+    driver: "",
+  });
+
+  const [newDriver, setNewDriver] = useState({
+    name: "",
+    phone: "",
+    license: "",
+    experience: "",
+  });
 
   const stats = [
     { label: "Активных авто", value: "47", change: "+3", icon: "Car", color: "text-green-400" },
@@ -925,6 +944,158 @@ const Index = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showAddVehicle} onOpenChange={setShowAddVehicle}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Icon name="Car" size={24} />
+              Добавить автомобиль
+            </DialogTitle>
+            <DialogDescription>
+              Заполните информацию о новом автомобиле
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="vehicleId">ID автомобиля</Label>
+              <Input
+                id="vehicleId"
+                placeholder="Например: A-106"
+                value={newVehicle.id}
+                onChange={(e) => setNewVehicle({ ...newVehicle, id: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vehicleBrand">Марка и модель</Label>
+              <Input
+                id="vehicleBrand"
+                placeholder="Например: Mercedes Sprinter"
+                value={newVehicle.brand}
+                onChange={(e) => setNewVehicle({ ...newVehicle, brand: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vehicleLocation">Локация</Label>
+              <Input
+                id="vehicleLocation"
+                placeholder="Например: Москва, ул. Ленина"
+                value={newVehicle.location}
+                onChange={(e) => setNewVehicle({ ...newVehicle, location: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vehicleDriver">Водитель (необязательно)</Label>
+              <Input
+                id="vehicleDriver"
+                placeholder="Например: Иванов И.И."
+                value={newVehicle.driver}
+                onChange={(e) => setNewVehicle({ ...newVehicle, driver: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vehicleStatus">Статус</Label>
+              <Select value={newVehicle.status} onValueChange={(value) => setNewVehicle({ ...newVehicle, status: value })}>
+                <SelectTrigger id="vehicleStatus">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Активен</SelectItem>
+                  <SelectItem value="inactive">Не активен</SelectItem>
+                  <SelectItem value="maintenance">На ТО</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddVehicle(false)}>
+              Отмена
+            </Button>
+            <Button onClick={() => {
+              if (!newVehicle.id || !newVehicle.brand || !newVehicle.location) {
+                toast.error("Заполните обязательные поля");
+                return;
+              }
+              toast.success("Автомобиль добавлен в систему!");
+              setShowAddVehicle(false);
+              setNewVehicle({ id: "", brand: "", status: "active", location: "", driver: "" });
+            }}>
+              <Icon name="Plus" size={16} className="mr-2" />
+              Добавить
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showAddDriver} onOpenChange={setShowAddDriver}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Icon name="UserPlus" size={24} />
+              Добавить водителя
+            </DialogTitle>
+            <DialogDescription>
+              Заполните информацию о новом водителе
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="driverName">ФИО водителя</Label>
+              <Input
+                id="driverName"
+                placeholder="Например: Смирнов Алексей Петрович"
+                value={newDriver.name}
+                onChange={(e) => setNewDriver({ ...newDriver, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="driverPhone">Телефон</Label>
+              <Input
+                id="driverPhone"
+                placeholder="+7 (999) 123-45-67"
+                value={newDriver.phone}
+                onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="driverLicense">Водительское удостоверение</Label>
+              <Input
+                id="driverLicense"
+                placeholder="99 99 123456"
+                value={newDriver.license}
+                onChange={(e) => setNewDriver({ ...newDriver, license: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="driverExperience">Стаж вождения (лет)</Label>
+              <Input
+                id="driverExperience"
+                type="number"
+                placeholder="5"
+                value={newDriver.experience}
+                onChange={(e) => setNewDriver({ ...newDriver, experience: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDriver(false)}>
+              Отмена
+            </Button>
+            <Button onClick={() => {
+              if (!newDriver.name || !newDriver.phone || !newDriver.license) {
+                toast.error("Заполните обязательные поля");
+                return;
+              }
+              toast.success("Водитель добавлен в систему!");
+              setShowAddDriver(false);
+              setNewDriver({ name: "", phone: "", license: "", experience: "" });
+            }}>
+              <Icon name="UserPlus" size={16} className="mr-2" />
+              Добавить
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
