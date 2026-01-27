@@ -1,0 +1,56 @@
+{
+  "tests": [
+    {
+      "name": "Get vehicles list",
+      "method": "GET",
+      "path": "/vehicles",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "vehicles": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get drivers list",
+      "method": "GET",
+      "path": "/drivers",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "drivers": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get maintenance schedule",
+      "method": "GET",
+      "path": "/maintenance",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "schedule": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get notifications",
+      "method": "GET",
+      "path": "/notifications",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "notifications": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get statistics",
+      "method": "GET",
+      "path": "/stats",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "active_vehicles": "number",
+        "active_drivers": "number",
+        "total_mileage": "number"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
