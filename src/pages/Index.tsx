@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
@@ -39,6 +40,10 @@ const Index = () => {
   const [vehicleOnMap, setVehicleOnMap] = useState<any>(null);
   const [vehicleHistory, setVehicleHistory] = useState<any>(null);
   const [showPromo, setShowPromo] = useState(false);
+  const [showContact, setShowContact] = useState(false);
+  const [contactForm, setContactForm] = useState({ name: '', phone: '', email: '', message: '' });
+  const [contactFiles, setContactFiles] = useState<File[]>([]);
+  const [contactSending, setContactSending] = useState(false);
 
   const [newVehicle, setNewVehicle] = useState({
     id: "",
@@ -1262,7 +1267,7 @@ const Index = () => {
       </Sheet>
 
       <Dialog open={showPromo} onOpenChange={setShowPromo}>
-        <DialogContent className="sm:max-w-[440px]">
+        <DialogContent className="sm:max-w-[460px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Icon name="Star" size={22} className="text-primary" />
@@ -1274,8 +1279,166 @@ const Index = () => {
               Полная функциональность программы будет работать после приобретения и настройки (в настройке мы помогаем до полного запуска под ваши требования).
             </p>
           </div>
-          <div className="flex justify-end">
-            <Button onClick={() => setShowPromo(false)}>Понятно</Button>
+          <div className="flex gap-3 pt-1">
+            <Button className="flex-1" onClick={() => { setShowPromo(false); setShowContact(true); }}>
+              <Icon name="ShoppingCart" size={16} className="mr-2" />
+              Приобрести полную версию
+            </Button>
+            <Button variant="outline" className="flex-1" onClick={() => { setShowPromo(false); setShowContact(true); }}>
+              <Icon name="MessageCircle" size={16} className="mr-2" />
+              Контакты для связи
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showContact} onOpenChange={(open) => { if (!contactSending) setShowContact(open); }}>
+        <DialogContent className="sm:max-w-[540px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Icon name="Send" size={22} className="text-primary" />
+              Связаться с нами
+            </DialogTitle>
+            <DialogDescription>
+              Заполните форму — мы ответим в течение рабочего дня
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2">
+                <Label htmlFor="c-name">ФИО <span className="text-destructive">*</span></Label>
+                <Input
+                  id="c-name"
+                  placeholder="Иванов Иван Иванович"
+                  value={contactForm.name}
+                  onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="c-phone">Номер телефона <span className="text-destructive">*</span></Label>
+                <Input
+                  id="c-phone"
+                  placeholder="+7 (999) 000-00-00"
+                  value={contactForm.phone}
+                  onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="c-email">Эл. адрес</Label>
+                <Input
+                  id="c-email"
+                  type="email"
+                  placeholder="mail@example.ru"
+                  value={contactForm.email}
+                  onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="c-message">Сообщение <span className="text-destructive">*</span></Label>
+              <Textarea
+                id="c-message"
+                placeholder="Опишите ваш запрос, количество автомобилей, пожелания..."
+                rows={4}
+                value={contactForm.message}
+                onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                className="mt-1 resize-none"
+              />
+            </div>
+            <div>
+              <Label>Файлы и документы (фото, PDF, любой формат)</Label>
+              <div
+                className="mt-1 border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors"
+                onClick={() => document.getElementById('c-files')?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const dropped = Array.from(e.dataTransfer.files);
+                  setContactFiles(prev => [...prev, ...dropped]);
+                }}
+              >
+                <Icon name="Upload" size={24} className="mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">Перетащите файлы или нажмите для выбора</p>
+                <p className="text-xs text-muted-foreground mt-1">Любой формат и размер</p>
+                <input
+                  id="c-files"
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    const selected = Array.from(e.target.files || []);
+                    setContactFiles(prev => [...prev, ...selected]);
+                    e.target.value = '';
+                  }}
+                />
+              </div>
+              {contactFiles.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {contactFiles.map((file, i) => (
+                    <div key={i} className="flex items-center gap-2 p-2 rounded-md bg-muted/40 text-sm">
+                      <Icon name="Paperclip" size={14} className="text-muted-foreground flex-shrink-0" />
+                      <span className="flex-1 truncate">{file.name}</span>
+                      <span className="text-xs text-muted-foreground flex-shrink-0">{(file.size / 1024 / 1024).toFixed(1)} МБ</span>
+                      <button
+                        className="text-muted-foreground hover:text-destructive transition-colors flex-shrink-0"
+                        onClick={() => setContactFiles(prev => prev.filter((_, idx) => idx !== i))}
+                      >
+                        <Icon name="X" size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setShowContact(false)} disabled={contactSending}>
+              Отмена
+            </Button>
+            <Button
+              className="flex-1"
+              disabled={contactSending || !contactForm.name || !contactForm.phone || !contactForm.message}
+              onClick={async () => {
+                setContactSending(true);
+                try {
+                  const filesData = await Promise.all(
+                    contactFiles.map(file => new Promise<{name: string; type: string; data: string}>((resolve, reject) => {
+                      const reader = new FileReader();
+                      reader.onload = () => resolve({ name: file.name, type: file.type, data: (reader.result as string).split(',')[1] });
+                      reader.onerror = reject;
+                      reader.readAsDataURL(file);
+                    }))
+                  );
+                  const res = await fetch('https://functions.poehali.dev/f8646802-535d-4c6d-b942-a1bce8e51a00', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...contactForm, files: filesData }),
+                  });
+                  if (res.ok) {
+                    toast.success('Сообщение отправлено! Мы свяжемся с вами в ближайшее время.');
+                    setContactForm({ name: '', phone: '', email: '', message: '' });
+                    setContactFiles([]);
+                    setShowContact(false);
+                  } else {
+                    const err = await res.json();
+                    toast.error(err.error || 'Ошибка отправки. Попробуйте ещё раз.');
+                  }
+                } catch {
+                  toast.error('Ошибка сети. Проверьте подключение и попробуйте снова.');
+                } finally {
+                  setContactSending(false);
+                }
+              }}
+            >
+              {contactSending ? (
+                <><Icon name="Loader" size={16} className="mr-2 animate-spin" />Отправляем...</>
+              ) : (
+                <><Icon name="Send" size={16} className="mr-2" />Отправить</>
+              )}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
