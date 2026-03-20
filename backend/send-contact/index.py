@@ -104,6 +104,17 @@ def handler(event: dict, context) -> dict:
         )
         files_html = f'<h3 style="margin-top:20px">Прикреплённые файлы ({len(file_links)}):</h3><ul>{items}</ul>'
 
+    reply_to = email if email else None
+    reply_btn = ''
+    if reply_to:
+        reply_btn = f'''
+        <div style="margin-top:20px">
+          <a href="mailto:{reply_to}?subject=Re:%20Ваша%20заявка%20в%20AutoFleet%20Pro"
+             style="display:inline-block;padding:10px 20px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-size:14px;font-weight:bold">
+            ✉ Ответить клиенту ({reply_to})
+          </a>
+        </div>'''
+
     html_body = f"""
     <h2 style="color:#333;margin-bottom:4px">Новая заявка с сайта</h2>
     <p style="color:#888;font-size:13px;margin-top:0">{now}</p>
@@ -114,12 +125,15 @@ def handler(event: dict, context) -> dict:
       <tr><td style="padding:10px 12px;font-weight:bold;background:#f0f0f0;border:1px solid #ddd;vertical-align:top">Сообщение</td><td style="padding:10px 12px;border:1px solid #ddd">{message.replace(chr(10), '<br>')}</td></tr>
     </table>
     {files_html}
+    {reply_btn}
     """
 
     msg = MIMEMultipart()
     msg['From'] = FROM_EMAIL
     msg['To'] = TO_EMAIL
     msg['Subject'] = f'=?utf-8?b?{base64.b64encode(f"Новая заявка от {name}".encode()).decode()}?='
+    if reply_to:
+        msg['Reply-To'] = reply_to
     msg.attach(MIMEText(html_body, 'html', 'utf-8'))
 
     try:

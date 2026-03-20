@@ -228,8 +228,8 @@ const Index = () => {
               ))}
             </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="md:col-span-2 lg:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Icon name="TrendingUp" size={20} />
@@ -384,7 +384,7 @@ const Index = () => {
                         </div>
                         {getStatusBadge(vehicle.status)}
                       </div>
-                      <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div className="grid grid-cols-3 gap-3 text-sm">
                         <div>
                           <div className="text-muted-foreground mb-1">Водитель</div>
                           <div className="font-medium">{vehicle.driver}</div>
@@ -445,7 +445,7 @@ const Index = () => {
                         </div>
                         {getStatusBadge(driver.status)}
                       </div>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                         <div>
                           <div className="text-muted-foreground mb-1">Эффективность</div>
                           <div className="flex items-center gap-2">
@@ -642,7 +642,7 @@ const Index = () => {
                         </div>
                         {getStatusBadge(vehicle.status)}
                       </div>
-                      <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div className="grid grid-cols-3 gap-3 text-sm">
                         <div>
                           <div className="text-muted-foreground mb-1">Водитель</div>
                           <div className="font-medium">{vehicle.driver}</div>
@@ -703,7 +703,7 @@ const Index = () => {
                       </div>
                       {getStatusBadge(driver.status)}
                     </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                       <div>
                         <div className="text-muted-foreground mb-1">Эффективность</div>
                         <div className="flex items-center gap-2">
@@ -893,8 +893,8 @@ const Index = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="col-span-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="sm:col-span-2">
                       <Label htmlFor="s-name">ФИО <span className="text-destructive">*</span></Label>
                       <Input
                         id="s-name"
@@ -1122,7 +1122,7 @@ const Index = () => {
           </DialogHeader>
           {selectedVehicle && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-muted-foreground">Статус</label>
                   <div className="mt-1">{getStatusBadge(selectedVehicle.status)}</div>
@@ -1218,7 +1218,7 @@ const Index = () => {
           </DialogHeader>
           {selectedDriver && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-muted-foreground">Рейтинг</label>
                   <p className="font-medium mt-1 flex items-center gap-1">
@@ -1518,8 +1518,8 @@ const Index = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="sm:col-span-2">
                 <Label htmlFor="c-name">ФИО <span className="text-destructive">*</span></Label>
                 <Input
                   id="c-name"
