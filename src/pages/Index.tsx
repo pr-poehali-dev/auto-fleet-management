@@ -36,6 +36,8 @@ const Index = () => {
   const [showAddDriver, setShowAddDriver] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [vehicleOnMap, setVehicleOnMap] = useState<any>(null);
+  const [vehicleHistory, setVehicleHistory] = useState<any>(null);
 
   const [newVehicle, setNewVehicle] = useState({
     id: "",
@@ -701,31 +703,72 @@ const Index = () => {
         {currentView === "gps" && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Icon name="Map" size={24} />
-                GPS мониторинг
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Map" size={24} />
+                  GPS мониторинг
+                </CardTitle>
+                {vehicleOnMap && (
+                  <Button variant="ghost" size="sm" onClick={() => setVehicleOnMap(null)}>
+                    <Icon name="X" size={14} className="mr-1" />
+                    Сбросить
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="aspect-[16/9] bg-muted/30 rounded-lg flex items-center justify-center border border-border">
-                <div className="text-center p-8">
-                  <Icon name="MapPin" size={64} className="mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-xl font-semibold mb-2">GPS мониторинг в реальном времени</h3>
-                  <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-                    Отслеживайте местоположение автомобилей на карте, анализируйте маршруты и оптимизируйте логистику
-                  </p>
-                  <div className="flex gap-3 justify-center">
-                    <Button>
-                      <Icon name="Settings" size={16} className="mr-2" />
-                      Настроить интеграцию
-                    </Button>
-                    <Button variant="outline">
-                      <Icon name="FileText" size={16} className="mr-2" />
-                      Документация
-                    </Button>
+              {vehicleOnMap ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
+                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                      <Icon name="Truck" size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{vehicleOnMap.id} • {vehicleOnMap.brand}</p>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <Icon name="MapPin" size={12} />
+                        {vehicleOnMap.location}
+                      </p>
+                    </div>
+                    <Badge className="ml-auto">{vehicleOnMap.status === "active" ? "В пути" : vehicleOnMap.status === "maintenance" ? "ТО" : "Стоит"}</Badge>
+                  </div>
+                  <div className="aspect-[16/9] bg-muted/30 rounded-lg flex items-center justify-center border border-border relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10" style={{backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 40px, currentColor 40px, currentColor 41px), repeating-linear-gradient(90deg, transparent, transparent 40px, currentColor 40px, currentColor 41px)"}} />
+                    <div className="text-center p-8 relative z-10">
+                      <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <Icon name="MapPin" size={32} className="text-primary-foreground" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-1">{vehicleOnMap.location}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">Текущее местоположение автомобиля</p>
+                      <p className="text-xs text-muted-foreground">Для отображения интерактивной карты подключите GPS-интеграцию</p>
+                      <Button className="mt-4" size="sm">
+                        <Icon name="Settings" size={14} className="mr-2" />
+                        Настроить GPS
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="aspect-[16/9] bg-muted/30 rounded-lg flex items-center justify-center border border-border">
+                  <div className="text-center p-8">
+                    <Icon name="MapPin" size={64} className="mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-xl font-semibold mb-2">GPS мониторинг в реальном времени</h3>
+                    <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                      Отслеживайте местоположение автомобилей на карте, анализируйте маршруты и оптимизируйте логистику
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                      <Button>
+                        <Icon name="Settings" size={16} className="mr-2" />
+                        Настроить интеграцию
+                      </Button>
+                      <Button variant="outline">
+                        <Icon name="FileText" size={16} className="mr-2" />
+                        Документация
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
@@ -885,15 +928,58 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button className="flex-1">
+                <Button className="flex-1" onClick={() => { setVehicleOnMap(selectedVehicle); setSelectedVehicle(null); setCurrentView("gps"); }}>
                   <Icon name="MapPin" size={16} className="mr-2" />
                   Показать на карте
                 </Button>
-                <Button variant="outline" className="flex-1">
+                <Button variant="outline" className="flex-1" onClick={() => { setVehicleHistory(selectedVehicle); setSelectedVehicle(null); }}>
                   <Icon name="FileText" size={16} className="mr-2" />
                   История
                 </Button>
               </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!vehicleHistory} onOpenChange={() => setVehicleHistory(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Icon name="FileText" size={24} />
+              История поездок — {vehicleHistory?.id} {vehicleHistory?.brand}
+            </DialogTitle>
+            <DialogDescription>
+              Последние поездки автомобиля
+            </DialogDescription>
+          </DialogHeader>
+          {vehicleHistory && (
+            <div className="space-y-3">
+              {[
+                { date: "20 марта 2026", route: "Москва, Тверская → Парковка Центр", distance: "12 км", duration: "28 мин", driver: vehicleHistory.driver !== "—" ? vehicleHistory.driver : "Не указан", time: "09:14" },
+                { date: "19 марта 2026", route: "Склад №3 → Москва, Тверская", distance: "34 км", duration: "55 мин", driver: vehicleHistory.driver !== "—" ? vehicleHistory.driver : "Не указан", time: "14:22" },
+                { date: "19 марта 2026", route: "Парковка Центр → Склад №3", distance: "31 км", duration: "50 мин", driver: vehicleHistory.driver !== "—" ? vehicleHistory.driver : "Не указан", time: "11:05" },
+                { date: "18 марта 2026", route: "Москва → Подольск, Заказчик", distance: "48 км", duration: "1 ч 10 мин", driver: vehicleHistory.driver !== "—" ? vehicleHistory.driver : "Не указан", time: "08:30" },
+                { date: "18 марта 2026", route: "Подольск → Москва", distance: "47 км", duration: "1 ч 15 мин", driver: vehicleHistory.driver !== "—" ? vehicleHistory.driver : "Не указан", time: "16:45" },
+              ].map((trip, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/40">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Icon name="Navigation" size={14} className="text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-medium text-sm truncate">{trip.route}</p>
+                      <span className="text-xs text-muted-foreground flex-shrink-0">{trip.time}</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><Icon name="MapPin" size={11} />{trip.distance}</span>
+                      <span className="flex items-center gap-1"><Icon name="Clock" size={11} />{trip.duration}</span>
+                      <span className="flex items-center gap-1"><Icon name="User" size={11} />{trip.driver}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">{trip.date}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </DialogContent>
