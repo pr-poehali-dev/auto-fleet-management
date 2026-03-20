@@ -38,6 +38,7 @@ const Index = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [vehicleOnMap, setVehicleOnMap] = useState<any>(null);
   const [vehicleHistory, setVehicleHistory] = useState<any>(null);
+  const [showPromo, setShowPromo] = useState(false);
 
   const [newVehicle, setNewVehicle] = useState({
     id: "",
@@ -741,7 +742,7 @@ const Index = () => {
                       <h3 className="text-lg font-semibold mb-1">{vehicleOnMap.location}</h3>
                       <p className="text-sm text-muted-foreground mb-4">Текущее местоположение автомобиля</p>
                       <p className="text-xs text-muted-foreground">Для отображения интерактивной карты подключите GPS-интеграцию</p>
-                      <Button className="mt-4" size="sm">
+                      <Button className="mt-4" size="sm" onClick={() => setShowPromo(true)}>
                         <Icon name="Settings" size={14} className="mr-2" />
                         Настроить GPS
                       </Button>
@@ -757,11 +758,11 @@ const Index = () => {
                       Отслеживайте местоположение автомобилей на карте, анализируйте маршруты и оптимизируйте логистику
                     </p>
                     <div className="flex gap-3 justify-center">
-                      <Button>
+                      <Button onClick={() => setShowPromo(true)}>
                         <Icon name="Settings" size={16} className="mr-2" />
                         Настроить интеграцию
                       </Button>
-                      <Button variant="outline">
+                      <Button variant="outline" onClick={() => setShowPromo(true)}>
                         <Icon name="FileText" size={16} className="mr-2" />
                         Документация
                       </Button>
@@ -778,7 +779,7 @@ const Index = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>График технического обслуживания</CardTitle>
-                <Button>
+                <Button onClick={() => setShowPromo(true)}>
                   <Icon name="Calendar" size={16} className="mr-2" />
                   Запланировать ТО
                 </Button>
@@ -847,7 +848,7 @@ const Index = () => {
                     </CardContent>
                   </Card>
                 </div>
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => setShowPromo(true)}>
                   <Icon name="Download" size={16} className="mr-2" />
                   Экспортировать все отчёты
                 </Button>
@@ -873,11 +874,11 @@ const Index = () => {
                     Управляйте платежами, счетами и финансовыми операциями вашего автопарка
                   </p>
                   <div className="flex gap-3 justify-center">
-                    <Button>
+                    <Button onClick={() => setShowPromo(true)}>
                       <Icon name="Settings" size={16} className="mr-2" />
                       Настроить платежи
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={() => setShowPromo(true)}>
                       <Icon name="HelpCircle" size={16} className="mr-2" />
                       Помощь
                     </Button>
@@ -1019,11 +1020,11 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button className="flex-1">
+                <Button className="flex-1" onClick={() => setShowPromo(true)}>
                   <Icon name="MessageCircle" size={16} className="mr-2" />
                   Написать
                 </Button>
-                <Button variant="outline" className="flex-1">
+                <Button variant="outline" className="flex-1" onClick={() => setShowPromo(true)}>
                   <Icon name="FileText" size={16} className="mr-2" />
                   Отчёт
                 </Button>
@@ -1236,22 +1237,22 @@ const Index = () => {
           <div className="space-y-4 mt-6">
             <div className="space-y-2">
               <h3 className="font-semibold">Основные</h3>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => setShowPromo(true)}>
                 <Icon name="Building" size={16} className="mr-2" />
                 Профиль компании
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => setShowPromo(true)}>
                 <Icon name="Users" size={16} className="mr-2" />
                 Управление пользователями
               </Button>
             </div>
             <div className="space-y-2">
               <h3 className="font-semibold">Интеграции</h3>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => setShowPromo(true)}>
                 <Icon name="Map" size={16} className="mr-2" />
                 GPS сервисы
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => setShowPromo(true)}>
                 <Icon name="CreditCard" size={16} className="mr-2" />
                 Платёжные системы
               </Button>
@@ -1259,6 +1260,25 @@ const Index = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      <Dialog open={showPromo} onOpenChange={setShowPromo}>
+        <DialogContent className="sm:max-w-[440px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Icon name="Star" size={22} className="text-primary" />
+              Полная версия программы
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            <p className="text-muted-foreground leading-relaxed">
+              Полная функциональность программы будет работать после приобретения и настройки (в настройке мы помогаем до полного запуска под ваши требования).
+            </p>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={() => setShowPromo(false)}>Понятно</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
