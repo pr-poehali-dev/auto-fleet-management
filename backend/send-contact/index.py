@@ -116,7 +116,7 @@ def handler(event: dict, context) -> dict:
         </div>'''
 
     html_body = f"""
-    <h2 style="color:#333;margin-bottom:4px">Новая заявка с сайта</h2>
+    <h2 style="color:#333;margin-bottom:4px">Новая заявка с сайта AutoFleet Pro</h2>
     <p style="color:#888;font-size:13px;margin-top:0">{now}</p>
     <table style="border-collapse:collapse;width:100%;font-family:Arial,sans-serif;margin-top:12px">
       <tr><td style="padding:10px 12px;font-weight:bold;background:#f0f0f0;border:1px solid #ddd;width:140px">ФИО</td><td style="padding:10px 12px;border:1px solid #ddd">{name}</td></tr>
@@ -131,7 +131,7 @@ def handler(event: dict, context) -> dict:
     msg = MIMEMultipart()
     msg['From'] = FROM_EMAIL
     msg['To'] = TO_EMAIL
-    msg['Subject'] = f'=?utf-8?b?{base64.b64encode(f"Новая заявка от {name}".encode()).decode()}?='
+    msg['Subject'] = f'=?utf-8?b?{base64.b64encode(f"[AutoFleet Pro] Новая заявка от {name}".encode()).decode()}?='
     if reply_to:
         msg['Reply-To'] = reply_to
     msg.attach(MIMEText(html_body, 'html', 'utf-8'))
