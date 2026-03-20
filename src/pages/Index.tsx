@@ -37,6 +37,7 @@ const Index = () => {
   const [showAddDriver, setShowAddDriver] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [vehicleOnMap, setVehicleOnMap] = useState<any>(null);
   const [vehicleHistory, setVehicleHistory] = useState<any>(null);
   const [showPromo, setShowPromo] = useState(false);
@@ -122,16 +123,19 @@ const Index = () => {
               <p className="text-xs text-muted-foreground">Управление автопарком</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => setShowNotifications(true)}>
               <Icon name="Bell" size={20} />
             </Button>
             <Button variant="ghost" size="icon" onClick={() => setShowSettings(true)}>
               <Icon name="Settings" size={20} />
             </Button>
-            <Avatar className="cursor-pointer">
+            <Avatar className="cursor-pointer hidden lg:flex">
               <AvatarFallback className="bg-primary text-primary-foreground">АД</AvatarFallback>
             </Avatar>
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setShowMobileMenu(true)}>
+              <Icon name="Menu" size={22} />
+            </Button>
           </div>
         </div>
       </header>
@@ -1652,6 +1656,49 @@ const Index = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Sheet open={showMobileMenu} onOpenChange={setShowMobileMenu}>
+        <SheetContent side="left" className="w-72 p-0">
+          <SheetHeader className="p-4 border-b border-border">
+            <SheetTitle className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <Icon name="Truck" className="text-primary-foreground" size={18} />
+              </div>
+              AutoFleet Pro
+            </SheetTitle>
+          </SheetHeader>
+          <nav className="p-3 space-y-1">
+            {[
+              { view: "dashboard", icon: "LayoutDashboard", label: "Дашборд" },
+              { view: "vehicles", icon: "Car", label: "Автопарк" },
+              { view: "drivers", icon: "Users", label: "Водители" },
+              { view: "gps", icon: "Map", label: "GPS мониторинг" },
+              { view: "maintenance", icon: "Wrench", label: "ТО и ремонт" },
+              { view: "reports", icon: "FileText", label: "Отчёты" },
+              { view: "billing", icon: "CreditCard", label: "Биллинг" },
+            ].map(({ view, icon, label }) => (
+              <Button
+                key={view}
+                variant={currentView === view ? "default" : "ghost"}
+                className="w-full justify-start gap-3"
+                onClick={() => { setCurrentView(view); setShowMobileMenu(false); }}
+              >
+                <Icon name={icon} size={18} />
+                {label}
+              </Button>
+            ))}
+            <div className="border-t border-border my-2" />
+            <Button
+              variant={currentView === "support" ? "default" : "ghost"}
+              className="w-full justify-start gap-3"
+              onClick={() => { setCurrentView("support"); setShowMobileMenu(false); }}
+            >
+              <Icon name="HeadphonesIcon" size={18} />
+              Техническая поддержка
+            </Button>
+          </nav>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
