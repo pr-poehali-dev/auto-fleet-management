@@ -194,6 +194,15 @@ const Index = () => {
             <Icon name="CreditCard" size={18} />
             Биллинг
           </Button>
+          <div className="border-t border-border my-2" />
+          <Button
+            variant={currentView === "support" ? "default" : "ghost"}
+            className="w-full justify-start gap-3"
+            onClick={() => setCurrentView("support")}
+          >
+            <Icon name="HeadphonesIcon" size={18} />
+            Техническая поддержка
+          </Button>
         </nav>
       </aside>
 
@@ -860,6 +869,207 @@ const Index = () => {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {currentView === "support" && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <Icon name="HeadphonesIcon" size={26} className="text-primary" />
+                Техническая поддержка
+              </h2>
+              <p className="text-muted-foreground mt-1">Опишите вашу проблему или вопрос — мы ответим в течение рабочего дня</p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Icon name="Send" size={20} />
+                    Связаться с нами
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="col-span-2">
+                      <Label htmlFor="s-name">ФИО <span className="text-destructive">*</span></Label>
+                      <Input
+                        id="s-name"
+                        placeholder="Иванов Иван Иванович"
+                        value={contactForm.name}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="s-phone">Номер телефона <span className="text-destructive">*</span></Label>
+                      <Input
+                        id="s-phone"
+                        placeholder="+7 (999) 000-00-00"
+                        value={contactForm.phone}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="s-email">Эл. адрес</Label>
+                      <Input
+                        id="s-email"
+                        type="email"
+                        placeholder="mail@example.ru"
+                        value={contactForm.email}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="s-message">Сообщение <span className="text-destructive">*</span></Label>
+                    <Textarea
+                      id="s-message"
+                      placeholder="Опишите вашу проблему или вопрос подробно..."
+                      rows={5}
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                      className="mt-1 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <Label>Прикрепить файлы (скриншоты, документы — любой формат)</Label>
+                    <div
+                      className="mt-1 border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors"
+                      onClick={() => document.getElementById('s-files')?.click()}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setContactFiles(prev => [...prev, ...Array.from(e.dataTransfer.files)]);
+                      }}
+                    >
+                      <Icon name="Upload" size={22} className="mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">Перетащите файлы или нажмите для выбора</p>
+                      <input
+                        id="s-files"
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          setContactFiles(prev => [...prev, ...Array.from(e.target.files || [])]);
+                          e.target.value = '';
+                        }}
+                      />
+                    </div>
+                    {contactFiles.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {contactFiles.map((file, i) => (
+                          <div key={i} className="flex items-center gap-2 p-2 rounded-md bg-muted/40 text-sm">
+                            <Icon name="Paperclip" size={14} className="text-muted-foreground flex-shrink-0" />
+                            <span className="flex-1 truncate">{file.name}</span>
+                            <span className="text-xs text-muted-foreground flex-shrink-0">{(file.size / 1024 / 1024).toFixed(1)} МБ</span>
+                            <button
+                              className="text-muted-foreground hover:text-destructive transition-colors"
+                              onClick={() => setContactFiles(prev => prev.filter((_, idx) => idx !== i))}
+                            >
+                              <Icon name="X" size={14} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    className="w-full"
+                    disabled={contactSending || !contactForm.name || !contactForm.phone || !contactForm.message}
+                    onClick={async () => {
+                      setContactSending(true);
+                      try {
+                        const filesData = await Promise.all(
+                          contactFiles.map(file => new Promise<{name: string; type: string; data: string}>((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve({ name: file.name, type: file.type, data: (reader.result as string).split(',')[1] });
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                          }))
+                        );
+                        const res = await fetch('https://functions.poehali.dev/f8646802-535d-4c6d-b942-a1bce8e51a00', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ ...contactForm, files: filesData }),
+                        });
+                        if (res.ok) {
+                          toast.success('Сообщение отправлено! Мы свяжемся с вами в ближайшее время.');
+                          setContactForm({ name: '', phone: '', email: '', message: '' });
+                          setContactFiles([]);
+                        } else {
+                          const err = await res.json();
+                          toast.error(err.error || 'Ошибка отправки. Попробуйте ещё раз.');
+                        }
+                      } catch {
+                        toast.error('Ошибка сети. Проверьте подключение и попробуйте снова.');
+                      } finally {
+                        setContactSending(false);
+                      }
+                    }}
+                  >
+                    {contactSending
+                      ? <><Icon name="Loader" size={16} className="mr-2 animate-spin" />Отправляем...</>
+                      : <><Icon name="Send" size={16} className="mr-2" />Отправить сообщение</>
+                    }
+                  </Button>
+                </CardContent>
+              </Card>
+              <div className="space-y-4">
+                <Card>
+                  <CardContent className="p-5 space-y-4">
+                    <h3 className="font-semibold text-base">Контактная информация</h3>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex items-start gap-3">
+                        <Icon name="Mail" size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-muted-foreground text-xs">Email</p>
+                          <p className="font-medium">ddmaxi-srs@yandex.ru</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Icon name="Clock" size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-muted-foreground text-xs">Время ответа</p>
+                          <p className="font-medium">В течение рабочего дня</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Icon name="Calendar" size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-muted-foreground text-xs">Режим работы</p>
+                          <p className="font-medium">Пн–Пт, 9:00–18:00</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-5 space-y-3">
+                    <h3 className="font-semibold text-base">Часто задаваемые вопросы</h3>
+                    <div className="space-y-2 text-sm">
+                      {[
+                        'Как подключить GPS-трекеры?',
+                        'Как настроить уведомления?',
+                        'Как добавить нового водителя?',
+                        'Как выгрузить отчёт?',
+                      ].map((q, i) => (
+                        <button
+                          key={i}
+                          className="w-full text-left p-2 rounded-md hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground flex items-center gap-2"
+                          onClick={() => setContactForm(prev => ({ ...prev, message: prev.message ? prev.message : q }))}
+                        >
+                          <Icon name="ChevronRight" size={14} className="flex-shrink-0" />
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
         )}
 
         {currentView === "billing" && (
