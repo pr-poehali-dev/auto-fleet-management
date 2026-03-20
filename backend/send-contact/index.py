@@ -1,5 +1,5 @@
 """
-Отправка контактной формы с вложениями на email ddmaxi-srs@yandex.ru
+Отправка контактной формы с вложениями на email ddmaxi-srs@yandex.ru v2
 """
 import json
 import os
